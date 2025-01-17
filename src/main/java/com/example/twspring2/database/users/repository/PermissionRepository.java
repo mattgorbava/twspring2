@@ -1,10 +1,8 @@
-package com.example.twspring2.database.repository;
+package com.example.twspring2.database.users.repository;
 
-import com.example.twspring2.database.model.PermissionEntity;
+import com.example.twspring2.database.users.model.PermissionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.security.Permission;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<PermissionEntity, Long> {

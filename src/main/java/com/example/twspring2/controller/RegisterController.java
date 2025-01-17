@@ -1,8 +1,7 @@
 package com.example.twspring2.controller;
 
-import com.example.twspring2.database.model.UserEntity;
-import com.example.twspring2.database.repository.UserRepository;
-import com.example.twspring2.service.UserService;
+import com.example.twspring2.database.users.model.UserEntity;
+import com.example.twspring2.service.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

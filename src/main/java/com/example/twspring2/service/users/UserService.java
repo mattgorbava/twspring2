@@ -1,27 +1,24 @@
-package com.example.twspring2.service;
+package com.example.twspring2.service.users;
 
-import com.example.twspring2.database.model.UserEntity;
-import com.example.twspring2.database.repository.RoleRepository;
-import com.example.twspring2.database.repository.UserRepository;
+import com.example.twspring2.database.users.model.UserEntity;
+import com.example.twspring2.database.users.repository.RoleRepository;
+import com.example.twspring2.database.users.repository.UserRepository;
 import com.example.twspring2.security.AuthenticatedUser;
 import com.example.twspring2.security.PasswordGeneratorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,13 +27,15 @@ import java.util.stream.Collectors;
 public class UserService extends OidcUserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private Logger logger = LoggerFactory.getLogger(UserService.class);
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @Override
@@ -54,14 +53,17 @@ public class UserService extends OidcUserService implements UserDetailsService {
     }
 
     @Override
-    public OidcUser loadUser(OidcUserRequest userRequest) throws AuthenticationException {
+    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
 
         String email = oidcUser.getEmail();
-        String name = oidcUser.getName();
+        String name = oidcUser.getFullName();
+
+        logger.info("Attempting to login using oauth");
 
         Optional<UserEntity> optUser = userRepository.findByEmail(email);
         if (optUser.isEmpty()) {
+            logger.info("Attempting to register using oauth");
             UserEntity newUser = new UserEntity();
             newUser.setEmail(email);
             newUser.setUsername(name);
@@ -82,6 +84,7 @@ public class UserService extends OidcUserService implements UserDetailsService {
         if (user.getRoles().isEmpty()) {
             user.setRoles(roleRepository.findAllByName("USER"));
         }
+        logger.info("Saving user: " + user);
         return userRepository.save(user);
     }
 
@@ -91,5 +94,22 @@ public class UserService extends OidcUserService implements UserDetailsService {
 
     public List<UserEntity> findAll() {
         return this.userRepository.findAll();
+    }
+
+    public void removeRole(Long userId, String roleName) {
+        UserEntity user = userRepository.findById(userId).orElseThrow();
+        user.getRoles().removeIf(role -> role.getName().equals(roleName));
+        roleService.removeRole(userId, roleName);
+        userRepository.save(user);
+    }
+
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id).orElseThrow();
+    }
+
+    public void addRole(Long userId, String roleName) {
+        UserEntity user = userRepository.findById(userId).orElseThrow();
+        user.addRole(roleRepository.findByName(roleName).orElseThrow());
+        userRepository.save(user);
     }
 }

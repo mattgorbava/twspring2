@@ -1,27 +1,21 @@
 package com.example.twspring2.security.config;
 
+import com.example.twspring2.service.users.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.util.AntPathMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler;
+    private final UserService userService;
 
-    public SecurityConfig(CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler) {
+    public SecurityConfig(CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler, UserService userService) {
         this.customAuthenticationSuccesHandler = customAuthenticationSuccesHandler;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        this.userService = userService;
     }
 
     @Bean
@@ -41,7 +35,9 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo.oidcUserService(userService))
                         .successHandler(customAuthenticationSuccesHandler)
+                        .defaultSuccessUrl("/home", true)
                 )
                 .logout(logout -> logout.permitAll());
 

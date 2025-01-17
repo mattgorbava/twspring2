@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html lang="en"
-    xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout-user.html}">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>User Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 </head>
 <body>
+<header>
     <h1>Welcome, <span th:text="${username}"></span></h1>
-    <table>
-        <thead>
-            <tr><th>User info</th></tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td th:text="${username}">Authenticated User</td>
-            </tr>
-        </tbody>
-    </table>
+</header>
+<main>
+    <div layout:fragment="content" class="album-grid">
+        <div class="w-1/12 aspect-square rounded relative">
+<!--            th:each="album: ${albums}"-->
+            <img class="w-full h-full object-cover rounded" src="https://media.brawltime.ninja/brawlers/surge/skins/skin/diy.png?size=400" alt="Album Cover">
+            <h3 style="height: 20%;"
+                class="font-mono absolute bottom-0 w-full bg-black bg-opacity-50 text-white text-center py-1 text-sm font-normal" >
+                SURGE SURGE SURGE
+            </h3>
+        </div>
+    </div>
+</main>
+<button id="create-album-btn">+</button>
 </body>
 </html>

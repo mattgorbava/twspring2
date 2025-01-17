@@ -1,7 +1,7 @@
-package com.example.twspring2.service;
+package com.example.twspring2.service.users;
 
-import com.example.twspring2.database.model.PermissionEntity;
-import com.example.twspring2.database.repository.PermissionRepository;
+import com.example.twspring2.database.users.model.PermissionEntity;
+import com.example.twspring2.database.users.repository.PermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

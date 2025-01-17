@@ -1,12 +1,12 @@
 package com.example.twspring2;
 
-import com.example.twspring2.database.model.PermissionEntity;
-import com.example.twspring2.database.model.Role;
-import com.example.twspring2.database.model.RoleEntity;
-import com.example.twspring2.database.model.UserEntity;
-import com.example.twspring2.service.PermissionService;
-import com.example.twspring2.service.RoleService;
-import com.example.twspring2.service.UserService;
+import com.example.twspring2.database.users.model.PermissionEntity;
+import com.example.twspring2.database.users.model.Role;
+import com.example.twspring2.database.users.model.RoleEntity;
+import com.example.twspring2.database.users.model.UserEntity;
+import com.example.twspring2.service.users.PermissionService;
+import com.example.twspring2.service.users.RoleService;
+import com.example.twspring2.service.users.UserService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;

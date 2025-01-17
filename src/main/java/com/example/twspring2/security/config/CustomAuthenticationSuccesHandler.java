@@ -1,6 +1,6 @@
 package com.example.twspring2.security.config;
 
-import com.example.twspring2.database.model.Role;
+import com.example.twspring2.database.users.model.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

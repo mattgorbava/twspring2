@@ -1,4 +1,4 @@
-package com.example.twspring2.database.model;
+package com.example.twspring2.database.users.model;
 
 import com.example.twspring2.security.AuthenticatedUser;
 import jakarta.persistence.*;

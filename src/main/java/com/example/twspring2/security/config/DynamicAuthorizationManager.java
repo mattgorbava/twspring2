@@ -1,7 +1,7 @@
 package com.example.twspring2.security.config;
 
-import com.example.twspring2.database.model.RoleEntity;
-import com.example.twspring2.service.RoleService;
+import com.example.twspring2.database.users.model.RoleEntity;
+import com.example.twspring2.service.users.RoleService;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;

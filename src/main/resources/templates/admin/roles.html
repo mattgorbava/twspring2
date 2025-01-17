@@ -25,27 +25,49 @@
                 <tr th:each="role : ${roles}" class="border-b hover:bg-gray-50">
                     <td class="px-4 py-2" th:text="${role.name}"></td>
                     <td class="px-4 py-2">
-                        <ul>
-                            <li th:each="permission : ${role.permissions}" th:text="${permission.httpMethod} + ' ' + ${permission.url}" class="text-sm"></li>
+                        <ul class="list-disc list-inside">
+                            <form th:each="permission: ${role.getPermissions()}" th:action="@{/admin/permissions/{permissionId}/delete(permissionId=${permission.id})}" method="post" class="inline-block">
+                                <span  th:text="${permission.httpMethod} + ' ' + ${permission.url}"></span>
+                                <button th:if="${role.name} != 'ADMIN'" type="submit" class="text-red-500 hover:text-red-700 focus:outline-none">X</button>
+                            </form>
                         </ul>
                     </td>
-                    <td class="px-4 py-2 text-center space-x-2">
-                        <form th:action="@{/admin/roles/{id}/edit(id=${role.id})}" method="post" class="inline-block">
+                    <td class="px-4 py-2 text-center space-x-2" th:if="${role.name} != 'ADMIN'">
+                        <form th:action="@{/admin/roles/{id}/new-permission(id=${role.id})}" method="post" class="inline-block">
+                            <input type="text" name="url" placeholder="Enter url"
+                                   class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                            <input type="text" name="method" placeholder="Enter HTTP method"
+                                   class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
                             <button type="submit"
                                     class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
-                                Edit
+                                Add permission
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/roles/{id}/new-name(id=${role.id})}" method="post" class="inline-block">
+                            <input type="text" name="role-name" placeholder="Enter new role name"
+                                   class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                            <button type="submit"
+                                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
+                                Save new name
                             </button>
                         </form>
                         <form th:action="@{/admin/roles/{id}/delete(id=${role.id})}" method="post" class="inline-block">
                             <button type="submit"
                                     class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 focus:outline-none">
-                                Delete
+                                Delete role
                             </button>
                         </form>
                     </td>
                 </tr>
                 </tbody>
             </table>
+            <form th:action="@{/admin/roles/new}" method="post" class="mt-4">
+                <input type="text" name="role-name" placeholder="Enter role name"
+                       class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                <button type="submit"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
+                    Add role
+                </button>
         </div>
     </div>
 </body>

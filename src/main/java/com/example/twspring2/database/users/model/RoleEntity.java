@@ -1,6 +1,7 @@
-package com.example.twspring2.database.model;
+package com.example.twspring2.database.users.model;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "role")
+@Transactional
 public class RoleEntity implements GrantedAuthority {
 
     @Id
@@ -33,5 +35,17 @@ public class RoleEntity implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return "ROLE_" + name;
+    }
+
+    public void addPermission(PermissionEntity permission) {
+        permissions.add(permission);
+    }
+
+    @Override
+    public String toString() {
+        return "RoleEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

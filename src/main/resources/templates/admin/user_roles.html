@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>User roles management</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4" th:text="${user.username} + '\'s roles'"/>           <table class="w-full border border-gray-200 rounded-lg">
+                <thead class="bg-indigo-600 text-white">
+                <tr>
+                    <th class="px-4 py-2 text-left">Role</th>
+                    <th class="px-4 py-2 text-left"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="role: ${user.roles}" class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2" th:text="${role.getName()}"></td>
+                    <td class="px-4 py-2 text-center space-x-2">
+                        <form method="post" th:action="@{/admin/remove-role(user-id=${user.id}, role-name=${role.name})}" class="inline-block">
+                            <button type="submit"
+                                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
+                                Remove from user
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <form method="post" th:action="@{/admin/add-role}" class="mt-4">
+                <input type="hidden" name="user-id" th:value="${user.id}"/>
+                <div class="flex items-center space-x-2">
+                    <select name="role-name"
+                            class="w-[250px] bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option th:each="role: ${roles}" th:value="${role.name}" th:text="${role.name}">
+                        </option>
+                    </select>
+                    <button type="submit"
+                            class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 focus:outline-none">
+                        Add Role
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

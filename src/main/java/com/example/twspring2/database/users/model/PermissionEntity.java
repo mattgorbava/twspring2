@@ -1,7 +1,8 @@
-package com.example.twspring2.database.model;
+package com.example.twspring2.database.users.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -18,6 +19,7 @@ public class PermissionEntity {
     private String url;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
 }

@@ -1,6 +1,6 @@
 package com.example.twspring2.controller;
 
-import com.example.twspring2.database.model.UserEntity;
+import com.example.twspring2.database.users.model.UserEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

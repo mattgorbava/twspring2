@@ -1,4 +1,4 @@
-package com.example.twspring2.database.model;
+package com.example.twspring2.database.users.model;
 
 public enum Role {
     ADMIN,

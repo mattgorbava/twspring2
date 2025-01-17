@@ -1,6 +1,6 @@
 package com.example.twspring2.controller;
 
-import com.example.twspring2.database.repository.UserRepository;
+import com.example.twspring2.database.users.repository.UserRepository;
 import com.example.twspring2.security.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
