@@ -2,7 +2,9 @@ package com.example.twspring2.database.albums.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.descriptor.jdbc.VarbinaryJdbcType;
 
 @Data
 @Entity
@@ -13,22 +15,20 @@ import org.hibernate.annotations.Type;
 public class ImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
+    @Column(name = "name", columnDefinition = "VARCHAR(255)")
     private String name;
 
+    @Column(name = "type", columnDefinition = "VARCHAR(255)")
     private String type;
 
     @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "image_data", columnDefinition = "BLOB")
+    @Column(name = "image_data", columnDefinition = "BYTEA")
+    @JdbcType(VarbinaryJdbcType.class)
     private byte[] imageData;
 
-    @OneToOne(mappedBy = "cover")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "album_id", referencedColumnName = "id")
     private AlbumEntity album;
-
-    @ManyToOne
-    @ToString.Exclude
-    @JoinColumn(name = "album_id", nullable = false)
-    private AlbumEntity albumEntity;
 }

@@ -18,11 +18,13 @@ public class AlbumEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "cover")
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private ImageEntity cover;
-
-    @Column(name = "images")
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="album", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ImageEntity> images;
+
+    @Transient
+    private ImageEntity coverImage;
+
+    public void setFirstImage(ImageEntity imageEntity) {
+        this.coverImage = imageEntity;
+    }
 }

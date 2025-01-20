@@ -12,10 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler;
     private final UserService userService;
+    private final DynamicAuthorizationManager dynamicAuthorizationManager;
 
-    public SecurityConfig(CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler, UserService userService) {
+    public SecurityConfig(CustomAuthenticationSuccesHandler customAuthenticationSuccesHandler, UserService userService, DynamicAuthorizationManager dynamicAuthorizationManager) {
         this.customAuthenticationSuccesHandler = customAuthenticationSuccesHandler;
         this.userService = userService;
+        this.dynamicAuthorizationManager = dynamicAuthorizationManager;
     }
 
     @Bean
@@ -26,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/*").authenticated()
-                        .anyRequest().authenticated()
+                        .anyRequest().access(dynamicAuthorizationManager)
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
