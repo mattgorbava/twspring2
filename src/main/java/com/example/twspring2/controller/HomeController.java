@@ -1,6 +1,7 @@
 package com.example.twspring2.controller;
 
 import com.example.twspring2.database.albums.model.AlbumEntity;
+import com.example.twspring2.database.albums.model.ImageEntity;
 import com.example.twspring2.database.users.repository.UserRepository;
 import com.example.twspring2.security.AuthenticatedUser;
 import com.example.twspring2.service.albums.AlbumService;
@@ -106,7 +107,18 @@ public class HomeController {
     @GetMapping("/album/{title}")
     public String getAlbum(@PathVariable("title") String title, Model model) {
         AlbumEntity album = albumService.findByTitle(title);
-        model.addAttribute("album", album);
+        model.addAttribute("albumTitle", title);
+        List<ImageEntity> images = imageService.getAlbumImages(album.getId());
+        Map<Long, String> imagesData = new HashMap<>();
+        for (ImageEntity image : images) {
+            if (image != null) {
+                byte[] imageData = image.getImageData();
+                String base64Image = Base64.getEncoder().encodeToString(imageData);
+                imagesData.put(image.getId(), base64Image);
+            }
+        }
+        model.addAttribute("imagesData", imagesData);
+        model.addAttribute("imageEntities", images);
         return "user/album";
     }
 }

@@ -38,4 +38,6 @@ public class AlbumService {
     public AlbumEntity findByTitle(String title) {
         return albumsRepository.findByTitle(title);
     }
+
+
 }

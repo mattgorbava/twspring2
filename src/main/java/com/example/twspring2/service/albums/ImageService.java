@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
 
@@ -42,5 +43,9 @@ public class ImageService {
                         .addContextValue("imageId", image.getId());
             }
         }).orElse(null);
+    }
+
+    public List<ImageEntity> getAlbumImages(Long albumId) {
+        return imageRepository.findAllByAlbum_Id(albumId);
     }
 }
