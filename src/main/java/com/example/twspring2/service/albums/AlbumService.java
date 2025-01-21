@@ -39,5 +39,7 @@ public class AlbumService {
         return albumsRepository.findByTitle(title);
     }
 
-
+    public void delete(AlbumEntity album) {
+        albumsRepository.delete(album);
+    }
 }

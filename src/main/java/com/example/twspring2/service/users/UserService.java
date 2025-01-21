@@ -59,11 +59,9 @@ public class UserService extends OidcUserService implements UserDetailsService {
         String email = oidcUser.getEmail();
         String name = oidcUser.getFullName();
 
-        logger.info("Attempting to login using oauth");
 
         Optional<UserEntity> optUser = userRepository.findByEmail(email);
         if (optUser.isEmpty()) {
-            logger.info("Attempting to register using oauth");
             UserEntity newUser = new UserEntity();
             newUser.setEmail(email);
             newUser.setUsername(name);
@@ -76,7 +74,15 @@ public class UserService extends OidcUserService implements UserDetailsService {
 
         AuthenticatedUser authenticatedUser = optUser.get().toAuthenticatedUser();
         authenticatedUser.setIdToken(oidcUser.getIdToken());
+//        List<SimpleGrantedAuthority> authorities = authenticatedUser.getAuthorities().stream()
+//                .map(authority -> new SimpleGrantedAuthority("ROLE_" + authority.getAuthority()))
+//                .collect(Collectors.toList());
+//        authenticatedUser.setAuthorities(authorities);
         return authenticatedUser;
+    }
+
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow();
     }
 
     public UserEntity save(UserEntity user) {

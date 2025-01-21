@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AlbumsRepository extends JpaRepository<AlbumEntity, Long> {
     AlbumEntity findByTitle(String title);
+
+    void deleteByTitle(String title);
 }

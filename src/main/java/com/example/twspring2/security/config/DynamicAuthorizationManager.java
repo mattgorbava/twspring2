@@ -2,6 +2,7 @@ package com.example.twspring2.security.config;
 
 import com.example.twspring2.database.users.model.RoleEntity;
 import com.example.twspring2.service.users.RoleService;
+import org.slf4j.Logger;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
 public class DynamicAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
     private final RoleService roleService;
     private final AntPathMatcher matcher;
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(DynamicAuthorizationManager.class);
 
     public DynamicAuthorizationManager(RoleService roleService) {
         this.roleService = roleService;
@@ -31,14 +33,21 @@ public class DynamicAuthorizationManager implements AuthorizationManager<Request
 
         List<RoleEntity> roles = roleService.findAll();
 
+        logger.info("Checking authorization for URL: {} and Method: {}", requestUrl, requestMethod);
+
+        logger.info("User has authorities: {}", authentication.get().getAuthorities());
+
         for (RoleEntity role : roles) {
+            logger.info("Checking role: {}", role.getName());
             if (authentication.get().getAuthorities().stream().anyMatch
                     (auth -> auth.getAuthority().equals("ROLE_" + role.getName()))) {
+                logger.info("User has role: {}", role.getName());
                 boolean hasPermission = role.getPermissions().stream().anyMatch
                         (permission -> matcher.match(permission.getUrl(), requestUrl) &&
                                 permission.getHttpMethod().equalsIgnoreCase(requestMethod));
 
                 if (hasPermission) {
+                    logger.info("User has permission for URL: {} and Method: {}", requestUrl, requestMethod);
                     return new AuthorizationDecision(true);
                 }
             }

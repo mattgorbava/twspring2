@@ -48,4 +48,12 @@ public class ImageService {
     public List<ImageEntity> getAlbumImages(Long albumId) {
         return imageRepository.findAllByAlbum_Id(albumId);
     }
+
+    public ImageEntity findById(Long imageId) {
+        return imageRepository.findById(imageId).orElse(null);
+    }
+
+    public void delete(ImageEntity image) {
+        imageRepository.delete(image);
+    }
 }

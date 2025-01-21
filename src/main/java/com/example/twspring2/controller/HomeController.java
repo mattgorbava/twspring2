@@ -2,6 +2,7 @@ package com.example.twspring2.controller;
 
 import com.example.twspring2.database.albums.model.AlbumEntity;
 import com.example.twspring2.database.albums.model.ImageEntity;
+import com.example.twspring2.database.users.model.UserEntity;
 import com.example.twspring2.database.users.repository.UserRepository;
 import com.example.twspring2.security.AuthenticatedUser;
 import com.example.twspring2.service.albums.AlbumService;
@@ -13,6 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -24,10 +29,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/home")
@@ -101,7 +103,21 @@ public class HomeController {
             logger.info("Error uploading image");
             return "redirect:/home/albums/create";
         }
-        return "redirect:/home";
+        try {
+            UserEntity updatedUser = userService.findByUsername(principal.getName());
+            List<GrantedAuthority> authorities = new ArrayList<>(updatedUser.getAuthorities());
+            for (GrantedAuthority authority : updatedUser.getAuthorities()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + authority.getAuthority()));
+            }
+            UserDetails userDetails = new User(updatedUser.getUsername(), updatedUser.getPassword(), authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, updatedUser.getPassword(), authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return "redirect:/home";
+        } catch (Exception e) {
+            logger.info("Error updating user");
+            return "redirect:/home/albums/create";
+        }
+        //return "redirect:/home";
     }
 
     @GetMapping("/album/{title}")
@@ -120,5 +136,19 @@ public class HomeController {
         model.addAttribute("imagesData", imagesData);
         model.addAttribute("imageEntities", images);
         return "user/album";
+    }
+
+    @PostMapping("/album/{title}/delete")
+    public String deleteAlbum(@PathVariable("title") String title) {
+        AlbumEntity album = albumService.findByTitle(title);
+        albumService.delete(album);
+        return "redirect:/home";
+    }
+
+    @PostMapping("/album/{title}/delete/{imageId}")
+    public String deleteImage(@PathVariable("title") String title, @PathVariable("imageId") Long imageId) {
+        ImageEntity image = imageService.findById(imageId);
+        imageService.delete(image);
+        return "redirect:/home/album/" + title;
     }
 }

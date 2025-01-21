@@ -62,18 +62,20 @@
     </div>
 </header>
 <main>
-    <div class="album-grid">
-        <h1 class="text-2xl" th:text="${albumTitle}"></h1>
-        <div class="w-1/12 aspect-square rounded relative" th:each="image: ${imageEntities}">
+    <h1 class="text-2xl" th:text="${albumTitle}"></h1>
+    <div class="grid grid-cols-6 gap-4">
+        <div class="relative block" th:each="image: ${imageEntities}">
             <img class="w-full h-full object-cover rounded" th:if="${imagesData.containsKey(image.id)}"
                  th:src="'data:' + ${image.type} + ';base64,' + ${imagesData[image.id]}" alt="Album Cover">
+            <form th:action="@{/home/album/{title}/delete/{imageId}(title=${albumTitle},imageId=${image.id})}" method="post">
+                <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                        th:type="submit">X</button>
+            </form>
         </div>
-        <form th:action="@{/home/albums/create}" th:method="get">
-            <button id="create-album-btn" title="Create new album" type="submit"
-                    class="text-2xl fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-300">+</button>
-        </form>
     </div>
 
 </main>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 </body>
 </html>
