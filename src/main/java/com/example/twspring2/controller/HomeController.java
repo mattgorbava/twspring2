@@ -121,8 +121,8 @@ public class HomeController {
     }
 
     @GetMapping("/album/{title}")
-    public String getAlbum(@PathVariable("title") String title, Model model) {
-        AlbumEntity album = albumService.findByTitle(title);
+    public String getAlbum(@PathVariable("title") String title, @PathVariable("id") String id, Model model) {
+        AlbumEntity album = albumService.findById(Long.valueOf(id));
         model.addAttribute("albumTitle", title);
         List<ImageEntity> images = imageService.getAlbumImages(album.getId());
         Map<Long, String> imagesData = new HashMap<>();
@@ -139,8 +139,8 @@ public class HomeController {
     }
 
     @PostMapping("/album/{title}/delete")
-    public String deleteAlbum(@PathVariable("title") String title) {
-        AlbumEntity album = albumService.findByTitle(title);
+    public String deleteAlbum(@PathVariable("title") String title, @PathVariable("id") String id) {
+        AlbumEntity album = albumService.findById(Long.valueOf(id));
         albumService.delete(album);
         return "redirect:/home";
     }
@@ -150,5 +150,42 @@ public class HomeController {
         ImageEntity image = imageService.findById(imageId);
         imageService.delete(image);
         return "redirect:/home/album/" + title;
+    }
+
+    @GetMapping("/search")
+    public String search(@RequestParam("query") String query, Model model) {
+        if (query == null || query.isEmpty()) {
+            List<AlbumEntity> albums = albumService.findAll();
+            Map<Long, String> albumCovers = new HashMap<>();
+            for (AlbumEntity album : albums) {
+                if (album.getCoverImage() != null) {
+                    byte[] imageData = album.getCoverImage().getImageData();
+                    String base64Image = Base64.getEncoder().encodeToString(imageData);
+                    albumCovers.put(album.getId(), base64Image);
+                }
+            }
+            model.addAttribute("albums", albums);
+            model.addAttribute("albumCovers", albumCovers);
+            return "user/home";
+        }
+        List<AlbumEntity> albums = albumService.search(query);
+        if (albums.isEmpty()) {
+            model.addAttribute("albums", new ArrayList<>());
+            model.addAttribute("message", "No results found");
+        } else {
+            Map<Long, String> albumCovers = new HashMap<>();
+            for (AlbumEntity album : albums) {
+                if (album.getCoverImage() != null) {
+                    byte[] imageData = album.getCoverImage().getImageData();
+                    String base64Image = Base64.getEncoder().encodeToString(imageData);
+                    albumCovers.put(album.getId(), base64Image);
+                }
+            }
+            model.addAttribute("albums", albums);
+            model.addAttribute("albumCovers", albumCovers);
+            logger.info("Albums found: " + albums.size());
+            logger.info("Covers: " + albumCovers.size());
+        }
+        return "user/home";
     }
 }

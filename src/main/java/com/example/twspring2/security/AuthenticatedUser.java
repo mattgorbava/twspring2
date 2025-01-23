@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter @Setter
 public class AuthenticatedUser extends User implements OidcUser, Serializable {
@@ -26,7 +27,9 @@ public class AuthenticatedUser extends User implements OidcUser, Serializable {
     private Map<String, Object> attributes;
 
     public AuthenticatedUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
+        super(username, password, authorities.stream()
+                .map(authority -> new SimpleGrantedAuthority("ROLE_" + authority.getAuthority()))
+                .collect(Collectors.toList()));
         this.email = username;
         this.password = password;
     }

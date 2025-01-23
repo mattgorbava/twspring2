@@ -28,7 +28,6 @@ public class AlbumService {
     public List<AlbumEntity> findAll() {
         List<AlbumEntity> albums = albumsRepository.findAll();
         albums.forEach(album -> {
-            logger.info("Album ID: " + album.getId());
             Optional<ImageEntity> firstImageOpt = imageRepository.findCover(album.getId());
             firstImageOpt.ifPresent(album::setFirstImage);
         });
@@ -41,5 +40,18 @@ public class AlbumService {
 
     public void delete(AlbumEntity album) {
         albumsRepository.delete(album);
+    }
+
+    public List<AlbumEntity> search(String query) {
+        List<AlbumEntity> albums = albumsRepository.search(query);
+        albums.forEach(album -> {
+            Optional<ImageEntity> firstImageOpt = imageRepository.findCover(album.getId());
+            firstImageOpt.ifPresent(album::setFirstImage);
+        });
+        return albums;
+    }
+
+    public AlbumEntity findById(Long id) {
+        return albumsRepository.findById(id).orElse(null);
     }
 }
