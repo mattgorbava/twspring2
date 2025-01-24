@@ -27,7 +27,7 @@
                     <td class="px-4 py-2">
                         <ul class="list-disc list-inside">
                             <form th:each="permission: ${role.getPermissions()}" th:action="@{/admin/permissions/{permissionId}/delete(permissionId=${permission.id})}" method="post" class="inline-block">
-                                <span  th:text="${permission.httpMethod} + ' ' + ${permission.url}"></span>
+                                <a th:href="@{/admin/permissions/edit/{permissionId}(permissionId=${permission.id})}" th:text="${permission.httpMethod} + ' ' + ${permission.url}"></a>
                                 <button th:if="${role.name} != 'ADMIN'" type="submit" class="text-red-500 hover:text-red-700 focus:outline-none">X</button>
                             </form>
                         </ul>
@@ -36,8 +36,12 @@
                         <form th:action="@{/admin/roles/{id}/new-permission(id=${role.id})}" method="post" class="inline-block">
                             <input type="text" name="url" placeholder="Enter url"
                                    class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
-                            <input type="text" name="method" placeholder="Enter HTTP method"
-                                   class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                            <select name="method" class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PATCH">PATCH</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
                             <button type="submit"
                                     class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
                                 Add permission

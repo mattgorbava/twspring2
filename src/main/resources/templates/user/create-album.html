@@ -12,7 +12,7 @@
 <header class="bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 text-white shadow-lg">
     <div class="container mx-auto flex justify-between items-center p-4">
         <!-- Application Name -->
-        <div class="text-2xl font-bold">Albums</div>
+        <a class="text-2xl font-bold" th:href="@{/home}">Albums</a>
 
         <!-- Profile Section -->
         <div x-data="{ open: false }" class="relative flex items-center space-x-4">
@@ -63,6 +63,7 @@
         <form th:action="@{/home/albums/create}" method="post" th:object="${album}" enctype="multipart/form-data">
             <label for="title" class="block mb-2">Title:</label>
             <input class = "border border-gray-300" type="text" id="title" name="title" required th:field="*{title}">
+            <p th:if="${titleMustBeUnique.equals('Not unique')}">Title already in use</p>
             <br>
             <label for="image" class="block mb-2">Select Images:</label>
             <input type="file" id="image" name="image" accept=".jpg, .png" multiple required>

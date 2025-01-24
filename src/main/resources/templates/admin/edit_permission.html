@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit permission</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Edit Permission</h1>
+
+            <form th:action="@{/admin/permissions/{id}/update(id=${permission.id})}" method="post">
+                <input type="hidden" name="id" th:value="${permission.id}">
+                <input type="text" name="url" placeholder="Enter url"
+                       class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2"
+                       th:value="${permission.url}">
+                <select name="method" class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                    <option value="GET" th:selected="${permission.httpMethod == 'GET'}">GET</option>
+                    <option value="POST" th:selected="${permission.httpMethod == 'POST'}">POST</option>
+                    <option value="PATCH" th:selected="${permission.httpMethod == 'PATCH'}">PATCH</option>
+                    <option value="DELETE" th:selected="${permission.httpMethod == 'DELETE'}">DELETE</option>
+                </select>
+                <button type="submit"
+                        class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 focus:outline-none">
+                    Update permission
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

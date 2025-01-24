@@ -126,4 +126,20 @@ public class AdminController {
         roleService.save(role);
         return "redirect:/admin/roles";
     }
+
+    @GetMapping("/permissions/edit/{permissionId}")
+    public String editPermission(@PathVariable("permissionId")Long permissionId, Model model) {
+        PermissionEntity permission = permissionService.findById(permissionId);
+        model.addAttribute("permission", permission);
+        return "admin/edit_permission";
+    }
+
+    @PostMapping("/permissions/{id}/update")
+    public String updatePermission(@PathVariable("id")Long id, @ModelAttribute("url")String url, @ModelAttribute("method")String method) {
+        PermissionEntity permission = permissionService.findById(id);
+        permission.setUrl(url);
+        permission.setHttpMethod(method);
+        permissionService.save(permission);
+        return "redirect:/admin/roles";
+    }
 }

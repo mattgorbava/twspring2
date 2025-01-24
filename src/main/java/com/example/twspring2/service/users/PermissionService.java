@@ -52,4 +52,8 @@ public class PermissionService {
         get.setHttpMethod("GET");
         this.save(get);
     }
+
+    public PermissionEntity findById(Long permissionId) {
+        return this.permissionRepository.findById(permissionId).orElse(null);
+    }
 }

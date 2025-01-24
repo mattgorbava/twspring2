@@ -118,4 +118,11 @@ public class UserService extends OidcUserService implements UserDetailsService {
         user.addRole(roleRepository.findByName(roleName).orElseThrow());
         userRepository.save(user);
     }
+
+    public List<UserEntity> findAllWithoutPermission(String albumTitle) {
+        String userRole = albumTitle.toUpperCase() + "_USER";
+        String ownerRole = albumTitle.toUpperCase() + "_OWNER";
+        List<UserEntity> users = userRepository.findAllWithoutPermission(userRole, ownerRole);
+        return users;
+    }
 }

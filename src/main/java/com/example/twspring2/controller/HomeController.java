@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/home")
@@ -48,24 +49,38 @@ public class HomeController {
         this.roleService = roleService;
     }
 
-    @GetMapping()
-    public String open(Model model, Principal principal) {
+    private void checkUserAuth(Model model, Principal principal) {
         if (principal instanceof UsernamePasswordAuthenticationToken authenticationToken) {
             Object principalObject = authenticationToken.getPrincipal();
 
             if (principalObject instanceof User userDetails) {
                 model.addAttribute("username", userDetails.getUsername());
+                List<String> roleNames = userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
+                model.addAttribute("roles", roleNames);
+                logger.info("User roles: {}", roleNames);
             }
         } else if (principal instanceof OAuth2AuthenticationToken authenticationToken) {
             Object principalObject = authenticationToken.getPrincipal();
 
             if (principalObject instanceof AuthenticatedUser user) {
                 model.addAttribute("username", user.getUsername());
+                List<String> roleNames = user.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
+                model.addAttribute("roles", roleNames);
+                logger.info("User roles: {}", roleNames);
             }
         }
         else {
             model.addAttribute("username", "Guest");
         }
+    }
+
+    @GetMapping()
+    public String open(Model model, Principal principal) {
+        checkUserAuth(model, principal);
 
         List<AlbumEntity> albums = albumService.findAll();
         Map<Long, String> albumCovers = new HashMap<>();
@@ -85,6 +100,7 @@ public class HomeController {
     @GetMapping("/albums/create")
     public String getCreateAlbum(Model model) {
         model.addAttribute("album", new AlbumEntity());
+        model.addAttribute("titleMustBeUnique", "Unique");
         return "user/create-album";
     }
 
@@ -92,13 +108,20 @@ public class HomeController {
     @PostMapping("/albums/create")
     public String postCreateAlbum(@ModelAttribute("album") AlbumEntity album,
                                   @RequestParam("image")List<MultipartFile> files,
-                                  RedirectAttributes redirectAttributes, Principal principal) throws IOException {
+                                  Model model, Principal principal) throws IOException {
         try {
-            albumService.save(album);
+            try {
+                albumService.save(album);
+            } catch (Exception e) {
+                logger.info("Error saving album");
+                model.addAttribute("titleMustBeUnique", "Not unique");
+                return "user/create-album";
+            }
             roleService.createAlbumRoles(album.getTitle(), principal.getName());
             for (MultipartFile file : files) {
                 imageService.uploadImage(file, album);
             }
+            model.addAttribute("titleMustBeUnique", "Unique");
         } catch (IOException e) {
             logger.info("Error uploading image");
             return "redirect:/home/albums/create";
@@ -121,8 +144,8 @@ public class HomeController {
     }
 
     @GetMapping("/album/{title}")
-    public String getAlbum(@PathVariable("title") String title, @PathVariable("id") String id, Model model) {
-        AlbumEntity album = albumService.findById(Long.valueOf(id));
+    public String getAlbum(@PathVariable("title") String title, Model model, Principal principal) {
+        AlbumEntity album = albumService.findByTitle(title);
         model.addAttribute("albumTitle", title);
         List<ImageEntity> images = imageService.getAlbumImages(album.getId());
         Map<Long, String> imagesData = new HashMap<>();
@@ -133,14 +156,17 @@ public class HomeController {
                 imagesData.put(image.getId(), base64Image);
             }
         }
+        checkUserAuth(model, principal);
+        List<UserEntity> users = userService.findAllWithoutPermission(title);
         model.addAttribute("imagesData", imagesData);
         model.addAttribute("imageEntities", images);
+        model.addAttribute("users", users);
         return "user/album";
     }
 
     @PostMapping("/album/{title}/delete")
-    public String deleteAlbum(@PathVariable("title") String title, @PathVariable("id") String id) {
-        AlbumEntity album = albumService.findById(Long.valueOf(id));
+    public String deleteAlbum(@PathVariable("title") String title) {
+        AlbumEntity album = albumService.findByTitle(title);
         albumService.delete(album);
         return "redirect:/home";
     }
@@ -187,5 +213,26 @@ public class HomeController {
             logger.info("Covers: " + albumCovers.size());
         }
         return "user/home";
+    }
+
+    @PostMapping("/album/{title}/add-images")
+    public String addImages(@PathVariable("title") String title, @RequestParam("image") List<MultipartFile> files) {
+        AlbumEntity album = albumService.findByTitle(title);
+        for (MultipartFile file : files) {
+            try {
+                imageService.uploadImage(file, album);
+            } catch (IOException e) {
+                logger.info("Error uploading image");
+                return "redirect:/home/album/" + title;
+            }
+        }
+        return "redirect:/home/album/" + title;
+    }
+
+    @PostMapping("/album/{title}/add-permission")
+    public String addPermission(@PathVariable("title") String title, @RequestParam("user") Long id) {
+        UserEntity user = userService.findById(id);
+        roleService.addRole(user, title.toUpperCase() + "_USER");
+        return "redirect:/home/album/" + title;
     }
 }

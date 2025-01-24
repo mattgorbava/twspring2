@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>User Home</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100">
 
@@ -12,7 +13,7 @@
 <header class="bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 text-white shadow-lg">
     <div class="container mx-auto flex justify-between items-center p-4">
         <!-- Application Name -->
-        <div class="text-2xl font-bold">Albums</div>
+        <a class="text-2xl font-bold" th:href="@{/home}">Albums</a>
 
         <!-- Search Input -->
         <form th:action="@{/home/search}" method="get">
@@ -74,27 +75,29 @@
 </header>
 <main>
     <div class="grid grid-cols-6 gap-4" th:if="${!albums.isEmpty()}">
-        <a th:href="@{/home/album/{title}(title=${album.title}, id=${album.id})}" th:each="album: ${albums}" class="relative block">
+        <a th:classappend="${roles.contains('ROLE_' + album.title.toUpperCase() + '_OWNER') or roles.contains('ROLE_' + album.title.toUpperCase() + '_USER') ? '' : 'pointer-events-none opacity-50'}"
+           th:href="@{/home/album/{title}(title=${album.title})}"  th:each="album: ${albums}" class="relative block">
             <img class="w-full h-full object-cover rounded" th:if="${albumCovers.containsKey(album.id)}"
                  th:src="'data:' + ${album.coverImage.type} + ';base64,' + ${albumCovers[album.id]}" alt="Album Cover">
             <h3 class="absolute bottom-0 w-full bg-black bg-opacity-50 text-white text-center py-1 text-base font-normal"
                 th:text="${album.title}" style="height: 20%;"/>
             <form th:action="@{/home/album/{title}/delete(title=${album.title}, id=${album.id})}" method="post">
                 <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                        th:type="submit">X</button>
+                        th:if="${roles.contains('ROLE_' + album.title.toUpperCase() + '_OWNER')}"
+                        th:type="submit" >X</button>
             </form>
         </a>
-        <form th:action="@{/home/albums/create}" th:method="get">
-            <button id="create-album-btn" title="Create new album" type="submit"
-                    class="text-2xl fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-300">+</button>
-        </form>
+
     </div>
 
     <div th:if="${albums.isEmpty()}" class="flex items-center justify-center h-96">
         <h1 class="text-3xl text-gray-500">No albums found</h1>
     </div>
+    <form th:action="@{/home/albums/create}" th:method="get">
+        <button id="create-album-btn" title="Create new album" type="submit"
+                class="text-2xl fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center transition-colors duration-300">+</button>
+    </form>
     </main>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>

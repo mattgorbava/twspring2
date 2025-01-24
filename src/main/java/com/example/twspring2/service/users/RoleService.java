@@ -75,4 +75,10 @@ public class RoleService {
         UserEntity user = this.userRepository.findByUsername(username).orElseThrow();
         user.addRole(role);
     }
+
+    public void addRole(UserEntity user, String albumTitle) {
+        RoleEntity role = this.roleRepository.findByName(albumTitle.toUpperCase()).orElseThrow();
+        user.addRole(role);
+        this.userRepository.save(user);
+    }
 }

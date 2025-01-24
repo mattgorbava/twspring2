@@ -33,21 +33,14 @@ public class DynamicAuthorizationManager implements AuthorizationManager<Request
 
         List<RoleEntity> roles = roleService.findAll();
 
-        logger.info("Checking authorization for URL: {} and Method: {}", requestUrl, requestMethod);
-
-        logger.info("User has authorities: {}", authentication.get().getAuthorities());
-
         for (RoleEntity role : roles) {
-            logger.info("Checking role: {}", role.getName());
             if (authentication.get().getAuthorities().stream().anyMatch
                     (auth -> auth.getAuthority().equals("ROLE_" + role.getName()))) {
-                logger.info("User has role: {}", role.getName());
                 boolean hasPermission = role.getPermissions().stream().anyMatch
                         (permission -> matcher.match(permission.getUrl(), requestUrl) &&
                                 permission.getHttpMethod().equalsIgnoreCase(requestMethod));
 
                 if (hasPermission) {
-                    logger.info("User has permission for URL: {} and Method: {}", requestUrl, requestMethod);
                     return new AuthorizationDecision(true);
                 }
             }

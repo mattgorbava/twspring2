@@ -54,11 +54,26 @@ public class DataInitializer implements ApplicationRunner {
         Boolean isRoleUserInDb = roleService.existsByName(user.getName());
         if(!isRoleUserInDb) {
             roleService.save(user);
-            PermissionEntity permissionEntity = new PermissionEntity();
-            permissionEntity.setHttpMethod("GET");
-            permissionEntity.setUrl("/home");
-            permissionEntity.setRole(user);
-            permissionService.save(permissionEntity);
+            PermissionEntity getHome = new PermissionEntity();
+            getHome.setHttpMethod("GET");
+            getHome.setUrl("/home");
+            getHome.setRole(user);
+            permissionService.save(getHome);
+            PermissionEntity getCreateAlbum = new PermissionEntity();
+            getCreateAlbum.setHttpMethod("GET");
+            getCreateAlbum.setUrl("/home/albums/create");
+            getCreateAlbum.setRole(user);
+            permissionService.save(getCreateAlbum);
+            PermissionEntity postCreateAlbum = new PermissionEntity();
+            postCreateAlbum.setHttpMethod("POST");
+            postCreateAlbum.setUrl("/home/albums/create");
+            postCreateAlbum.setRole(user);
+            permissionService.save(postCreateAlbum);
+            PermissionEntity getHomeSearch = new PermissionEntity();
+            getHomeSearch.setHttpMethod("GET");
+            getHomeSearch.setUrl("/home/search/**");
+            getHomeSearch.setRole(user);
+            permissionService.save(getHomeSearch);
         }
 
         Boolean isRoleDefaultInDb = roleService.existsByName(defaultRole.getName());

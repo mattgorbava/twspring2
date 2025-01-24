@@ -4,6 +4,7 @@ import com.example.twspring2.database.albums.model.AlbumEntity;
 import com.example.twspring2.database.albums.model.ImageEntity;
 import com.example.twspring2.database.albums.repository.AlbumsRepository;
 import com.example.twspring2.database.albums.repository.ImageRepository;
+import com.example.twspring2.database.users.model.UserEntity;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 

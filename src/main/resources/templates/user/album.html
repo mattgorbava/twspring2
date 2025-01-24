@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>User Home</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="min-h-screen flex flex-col bg-gray-100">
 
@@ -12,11 +13,7 @@
 <header class="bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 text-white shadow-lg">
     <div class="container mx-auto flex justify-between items-center p-4">
         <!-- Application Name -->
-        <div class="text-2xl font-bold">Albums</div>
-
-        <!-- Search Input -->
-        <input type="text" id="search-bar" placeholder="Search albums..."
-               class="w-64 h-10 rounded-full ml-auto mr-2 pl-2.5 border border-gray-300 text-black">
+        <a class="text-2xl font-bold" th:href="@{/home}">Albums</a>
 
         <!-- Profile Section -->
         <div x-data="{ open: false }" class="relative flex items-center space-x-4">
@@ -69,13 +66,39 @@
                  th:src="'data:' + ${image.type} + ';base64,' + ${imagesData[image.id]}" alt="Album Cover">
             <form th:action="@{/home/album/{title}/delete/{imageId}(title=${albumTitle},imageId=${image.id})}" method="post">
                 <button class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                        th:if="${roles.contains('ROLE_' + albumTitle.toUpperCase() + '_OWNER')}"
                         th:type="submit">X</button>
             </form>
         </div>
     </div>
 
+    <div class="flex justify-center space-x-4 mx-auto" th:if="${roles.contains('ROLE_' + albumTitle.toUpperCase() + '_OWNER')}">
+        <div class="mt-4 p-6 bg-white rounded-lg border border-gray-300 shadow-md w-1/6">
+            <form th:action="@{/home/album/{title}/add-images(title=${albumTitle})}" method="post" enctype="multipart/form-data">
+                <label for="image" class="block mb-2">Add new images:</label>
+                <input type="file" id="image" name="image" accept=".jpg, .png" multiple required>
+                <br>
+                <div class="flex justify-center mt-2">
+                    <button class="rounded-lg text-2xl bg-blue-500 hover:bg-blue-700 text-white w-20 h-10 flex items-center justify-center transition-colors duration-300"
+                            type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="mt-4 p-6 bg-white rounded-lg border border-gray-300 shadow-md w-1/6">
+            <form th:action="@{/home/album/{title}/add-permission(title=${albumTitle})}" method="post" enctype="multipart/form-data">
+                <label for="image" class="block mb-2">Give another user permission to view the album:</label>
+                <select name="user" class="w-40 border rounded py-2 px-3 focus:outline-none focus:border-indigo-500 mb-2">
+                    <option th:each="user: ${users}" th:text="${user.getUsername()}" th:value="${user.getId()}"></option>
+                </select>
+                <div class="flex justify-center mt-2">
+                    <button class="rounded-lg text-2xl bg-blue-500 hover:bg-blue-700 text-white w-20 h-10 flex items-center justify-center transition-colors duration-300"
+                            type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </main>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 </body>
 </html>
