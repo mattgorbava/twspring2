@@ -5,6 +5,7 @@ import com.example.twspring2.database.users.model.RoleEntity;
 import com.example.twspring2.database.users.model.UserEntity;
 import com.example.twspring2.database.users.repository.RoleRepository;
 import com.example.twspring2.database.users.repository.UserRepository;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Service
 public class RoleService {
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(RoleService.class);
     private RoleRepository roleRepository;
     private UserRepository userRepository;
     private PermissionService permissionService;
@@ -70,9 +72,21 @@ public class RoleService {
         permissionService.createAlbumOwnerRolePermissions(role, albumTitle);
         RoleEntity userRole = new RoleEntity();
         userRole.setName(albumTitle.toUpperCase() + "_USER");
+        logger.info("Creating role: " + userRole.getName());
         this.save(userRole);
         permissionService.createAlbumUserPermissions(userRole, albumTitle);
-        UserEntity user = this.userRepository.findByUsername(username).orElseThrow();
+
+        UserEntity user = null;
+        try{
+            user = this.userRepository.findByUsername(username).orElseThrow();
+        } catch (Exception e) {
+            try {
+                user = this.userRepository.findByEmail(username).orElseThrow();
+            } catch (Exception e2) {
+                logger.error("User not found: " + username);
+            }
+        }
+        assert user != null;
         user.addRole(role);
     }
 

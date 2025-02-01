@@ -179,7 +179,8 @@ public class HomeController {
     }
 
     @GetMapping("/search")
-    public String search(@RequestParam("query") String query, Model model) {
+    public String search(@RequestParam("query") String query, Model model, Principal principal) {
+        logger.info("Searching for: " + query);
         if (query == null || query.isEmpty()) {
             List<AlbumEntity> albums = albumService.findAll();
             Map<Long, String> albumCovers = new HashMap<>();
@@ -192,6 +193,7 @@ public class HomeController {
             }
             model.addAttribute("albums", albums);
             model.addAttribute("albumCovers", albumCovers);
+            checkUserAuth(model, principal);
             return "user/home";
         }
         List<AlbumEntity> albums = albumService.search(query);
@@ -212,6 +214,7 @@ public class HomeController {
             logger.info("Albums found: " + albums.size());
             logger.info("Covers: " + albumCovers.size());
         }
+        checkUserAuth(model, principal);
         return "user/home";
     }
 

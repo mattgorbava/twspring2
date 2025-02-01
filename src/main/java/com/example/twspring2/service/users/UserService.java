@@ -82,7 +82,17 @@ public class UserService extends OidcUserService implements UserDetailsService {
     }
 
     public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow();
+        UserEntity user = null;
+        try {
+            user = userRepository.findByUsername(username).orElseThrow();
+        } catch (Exception e) {
+            try {
+                user = userRepository.findByEmail(username).orElseThrow();
+            } catch (Exception e2) {
+                logger.error("User not found: " + username);
+            }
+        }
+        return user;
     }
 
     public UserEntity save(UserEntity user) {
